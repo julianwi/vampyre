@@ -67,7 +67,7 @@ class Convolve2DLT(BaseLinTrans):
         self.srep_axes = self.chan_axes
         
         # Superclass constructor
-        dtype = np.float
+        dtype = np.float64
         BaseLinTrans.__init__(self, shape, shape, dtype, dtype,\
                               svd_avail=True,name='Convolve2D')
 
