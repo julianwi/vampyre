@@ -42,9 +42,9 @@ class GaussEst(BaseEst):
         if np.isscalar(shape):
             shape = (shape,)
         if is_complex:
-            dtype = np.double
-        else:
             dtype = np.complex128
+        else:
+            dtype = np.double
              
         BaseEst.__init__(self,shape=shape,dtype=dtype,name=name,
                          var_axes=var_axes,type_name='GaussEst', cost_avail=True)
