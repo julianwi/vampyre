@@ -182,6 +182,10 @@ class LinEst(BaseEst):
         if not avg_var_cost:
             raise ValueError("disabling variance averaging not supported for LinEst")
 
+        # Infinite variance case
+        if np.any(rvar==np.Inf):
+            return self.est_init(return_cost=return_cost, ind_out=ind_out, avg_var_cost=avg_var_cost)
+
 
         # Get the diagonal parameters
         s, sshape, srep_axes = self.A.get_svd_diag()

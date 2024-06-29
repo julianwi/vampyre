@@ -51,6 +51,11 @@ def gauss_test(zshape=(1000,10), verbose=False, tol=0.1):
         raise vp.common.TestException("Initial estimate Gaussian error "+ 
            "does not match predicted value")
     
+    # Infinite variance case should match the initial estimate
+    zhat, zhatvar = est.est(r,np.Inf,return_cost=False)
+    if not np.allclose(zhat, zmean1) or not np.allclose(zhatvar, zvar1):
+        raise vp.common.TestException("Infinite variance estimate does not match initial estimate")
+
     # Posterior estimate
     zhat, zhatvar, cost = est.est(r,rvar,return_cost=True)
     zerr = np.mean(np.abs(z-zhat)**2)

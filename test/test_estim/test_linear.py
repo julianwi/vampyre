@@ -56,6 +56,11 @@ def lin_test(zshape=(500,10),Ashape=(1000,500),verbose=False,tol=0.1):
         raise vp.common.TestException(\
            "est_init does not produce the correct shape")            
     
+    # Infinite variance case should match the initial estimate
+    zhat_inf, zhatvar_inf = est.est(r,np.Inf,return_cost=False)
+    if not np.allclose(zhat_inf, zhat) or not np.allclose(zhatvar_inf, zhatvar):
+        raise vp.common.TestException("Infinite variance estimate does not match initial estimate")
+
     # Posterior estimate
     zhat, zhatvar, cost = est.est(r,rvar,return_cost=True)
     zerr = np.mean(np.abs(z-zhat)**2)

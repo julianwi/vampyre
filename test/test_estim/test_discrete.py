@@ -79,6 +79,11 @@ def discrete_test(zshape=(1000,10), verbose=False, nvals=10,\
         raise vp.common.TestException(\
            "Initial variance does not match expected value")
     
+    # Infinite variance case should match the initial estimate
+    hat, zhatvar = est.est(r,np.Inf,return_cost=False)
+    if not np.allclose(hat, zmean) or not np.allclose(zhatvar, zvar):
+        raise vp.common.TestException("Infinite variance estimate does not match initial estimate")
+
     # Get posterior estimate
     zhat, zhatvar, cost = est.est(r,rvar,return_cost=True)
     

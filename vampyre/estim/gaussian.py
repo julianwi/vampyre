@@ -133,7 +133,7 @@ class GaussEst(BaseEst):
         
         # Infinite variance case
         if np.any(rvar==np.Inf):
-            return self.est_init(return_cost, avg_var_cost)
+            return self.est_init(return_cost=return_cost, ind_out=ind_out, avg_var_cost=avg_var_cost)
                     
         zhatvar = rvar*self.zvar/(rvar + self.zvar)
         gain = self.zvar/(rvar + self.zvar)
