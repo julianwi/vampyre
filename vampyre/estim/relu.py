@@ -193,6 +193,11 @@ class ReLUEst(BaseEst):
         rvar0 = common.repeat_axes(rvar0,self.shape[0],self.var_axes[0])
         rvar1 = common.repeat_axes(rvar1,self.shape[1],self.var_axes[1])
         
+        # Compute the MAP estimate
+        zhat_map, zvar_map = self.est_map(r,rvar,return_cost=False,ind_out=[0,1])
+        zhat0_map, zhat1_map = zhat_map
+        zvar0_map, zvar1_map = zvar_map
+
         if np.any(rvar1 == np.Inf):
             # Infinite variance case.
             zvarp = rvar0
@@ -204,11 +209,6 @@ class ReLUEst(BaseEst):
             Amax = 0
                         
         else:
-            
-            # Compute the MAP estimate
-            zhat_map, zvar_map = self.est_map(r,rvar,return_cost=False,ind_out=[0,1])
-            zhat0_map, zhat1_map = zhat_map
-            zvar0_map, zvar1_map = zvar_map
                             
             # Compute the conditional Gaussian terms for z > 0 and z < 0
             zvarp = rvar0*rvar1/(rvar0+rvar1)

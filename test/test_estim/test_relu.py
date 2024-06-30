@@ -13,7 +13,7 @@ env.add_vp_path()
 import vampyre as vp
 
 
-def relu_test(zshape=(1000,10),tol=0.15,verbose=False,map_est=False):
+def relu_test(zshape=(1000,10),tol=0.15,verbose=False,map_est=False,rvar1=None):
     """
     ReLUEstim unit test.
     
@@ -33,7 +33,8 @@ def relu_test(zshape=(1000,10),tol=0.15,verbose=False,map_est=False):
         
     # Set random parameters
     rvar0 = np.power(10,np.random.uniform(-2,1,ns))
-    rvar1 = np.power(10,np.random.uniform(-2,1,ns))
+    if rvar1 is None:
+        rvar1 = np.power(10,np.random.uniform(-2,1,ns))
         
     # Construct random input
     r0 = np.random.normal(0,1,zshape) 
@@ -85,6 +86,9 @@ class TestCases(unittest.TestCase):
         
         # MAP test. we use a higher tolerance, since the error is approximate        
         relu_test(verbose=verbose,map_est=True,tol=1)        
+
+        # MMSE test with infinite rvar1 variance
+        relu_test(verbose=verbose,map_est=False,tol=0.15,zshape=(1000,10),rvar1=np.inf*np.ones(10))
         
 if __name__ == '__main__':    
     unittest.main()
