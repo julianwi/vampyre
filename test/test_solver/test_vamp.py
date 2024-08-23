@@ -150,7 +150,7 @@ def vamp_gauss_test(nz=100,ny=200,ns=10, snr=30, map_est=False, verbose=False,\
              "Termwise {0:12.4e} solver: {1:12.4e}".format(cost_tota,solver.cost))                        
     if np.abs(cost_tot - cost_tota) > tol:
         raise vp.common.TestException("Direct and termwise costs do not match")
-    if np.abs(cost_tot - cost_tota) > tol:
+    if np.abs(cost_tot - solver.cost) > tol:
         raise vp.common.TestException("Predicted cost does not match solver output")
                     
 def vamp_gmm_test(nz=100,ny=200,ns=10, snr=30, verbose=False, mse_tol=-17):    
