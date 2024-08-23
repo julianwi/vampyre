@@ -187,7 +187,7 @@ class LinEstTwo(BaseEst):
         if ind_out is None:
             ind_out = [0,1]
         if not avg_var_cost:
-            raise ValueError("disabling variance averaging not supported for MixEst")
+            raise ValueError("disabling variance averaging not supported for LinEstTwo")
 
         
         # Set initial mean and variance
@@ -232,7 +232,7 @@ class LinEstTwo(BaseEst):
         if ind_out is None:
             ind_out = [0,1]
         if not avg_var_cost:
-            raise ValueError("disabling variance averaging not supported for MixEst")
+            raise ValueError("disabling variance averaging not supported for LinEstTwo")
 
         if self.est_meth == 'svd':
             return self.est_svd(r,rvar,return_cost,ind_out)
@@ -627,8 +627,8 @@ class LSQROp(scipy.sparse.linalg.LinearOperator):
     This can be solved with LSQR.
     
     When wvar == 0:
-        F(z0) = [D*z0; A.dot(z0)]  g = D*[r0; r1-b]  
-        D= diag(1/sqrt([rvar0; rvar1]))
+        F(z0) = D*[z0; A.dot(z0)]  g = D*[r0; r1-b]  
+        D = diag(1/sqrt([rvar0; rvar1]))
         
     When wvar > 0:
         F(z0,z1) = D*[z1-A.dot(z0); z0; z1]  g=D*[b; r0; r1]
