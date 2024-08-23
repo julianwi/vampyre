@@ -13,7 +13,7 @@ import vampyre as vp
 
             
 def vamp_gauss_test(nz=100,ny=200,ns=10, snr=30, map_est=False, verbose=False,\
-    is_complex=False, tol=1e-5):
+    is_complex=False, tol=1e-5, tol_var=1e-5, tol_cost=1e-5, est_meth='svd'):
     """
     Unit test for VAMP method using a Gaussian prior.
     
@@ -68,7 +68,7 @@ def vamp_gauss_test(nz=100,ny=200,ns=10, snr=30, map_est=False, verbose=False,\
            
     # Create output estimator
     Aop = vp.trans.MatrixLT(A,zshape)
-    est_out = vp.estim.LinEst(Aop,y,wvar,map_est=map_est, name='Posterior')
+    est_out = vp.estim.LinEst(Aop,y,wvar,map_est=map_est, name='Posterior', est_meth=est_meth)
     
     # Create the variance handler
     msg_hdl = vp.estim.MsgHdlSimp(map_est=map_est, is_complex=is_complex, \
@@ -96,7 +96,7 @@ def vamp_gauss_test(nz=100,ny=200,ns=10, snr=30, map_est=False, verbose=False,\
     zvar_err = np.abs(zvar-np.mean(solver.zvar2))
     if verbose:
         print("zvar error: {0:12.4e}".format(zvar_err))
-    if zvar_err > tol:
+    if zvar_err > tol_var:
         raise vp.common.TestException("Variance does not match")
         
     
@@ -148,12 +148,12 @@ def vamp_gauss_test(nz=100,ny=200,ns=10, snr=30, map_est=False, verbose=False,\
     if verbose:    
         print("costs: Direct {0:12.4e} ".format(cost_tot)+\
              "Termwise {0:12.4e} solver: {1:12.4e}".format(cost_tota,solver.cost))                        
-    if np.abs(cost_tot - cost_tota) > tol:
+    if np.abs(cost_tot - cost_tota) > tol_cost:
         raise vp.common.TestException("Direct and termwise costs do not match")
-    if np.abs(cost_tot - solver.cost) > tol:
+    if np.abs(cost_tot - solver.cost) > tol_cost:
         raise vp.common.TestException("Predicted cost does not match solver output")
                     
-def vamp_gmm_test(nz=100,ny=200,ns=10, snr=30, verbose=False, mse_tol=-17):    
+def vamp_gmm_test(nz=100,ny=200,ns=10, snr=30, verbose=False, mse_tol=-17, est_meth='svd'):    
     """
     Unit test for VAMP using a Gaussian mixture model (GMM)
     
@@ -216,7 +216,7 @@ def vamp_gmm_test(nz=100,ny=200,ns=10, snr=30, verbose=False, mse_tol=-17):
 
     # Create output estimator
     Aop = vp.trans.MatrixLT(A,zshape)
-    est_out = vp.estim.LinEst(Aop,y,wvar,map_est=map_est)
+    est_out = vp.estim.LinEst(Aop,y,wvar,map_est=map_est,est_meth=est_meth)
 
     # Create the variance handler
     msg_hdl = vp.estim.MsgHdlSimp(map_est=map_est, is_complex=is_complex,\
@@ -243,7 +243,7 @@ def vamp_gmm_test(nz=100,ny=200,ns=10, snr=30, verbose=False, mse_tol=-17):
     if mse[-1] > mse_tol:
         raise vp.common.TestException("MSE exceeded expected value")
         
-def vamp_bg_test(nz=1000,ny=500,ns=1, snr=30, verbose=False, pred_tol=3.0):    
+def vamp_bg_test(nz=1000,ny=500,ns=1, snr=30, verbose=False, pred_tol=3.0, est_meth='svd'):    
     """
     Unit test for VAMP using a Gaussian mixture model (GMM)
     
@@ -299,7 +299,7 @@ def vamp_bg_test(nz=1000,ny=500,ns=1, snr=30, verbose=False, pred_tol=3.0):
 
     # Create output estimator
     Aop = vp.trans.MatrixLT(A,zshape)
-    est_out = vp.estim.LinEst(Aop,y,wvar,map_est=map_est)
+    est_out = vp.estim.LinEst(Aop,y,wvar,map_est=map_est, est_meth=est_meth)
 
     # Create the variance handler
     msg_hdl = vp.estim.MsgHdlSimp(map_est=map_est, is_complex=is_complex,\
@@ -342,18 +342,25 @@ class TestCases(unittest.TestCase):
             vamp_gauss_test(nz=200,ny=100,ns=10,map_est=map_est,verbose=verbose)
             vamp_gauss_test(nz=100,ny=200,ns=1,map_est=map_est,verbose=verbose)
             vamp_gauss_test(nz=200,ny=100,ns=1,map_est=map_est,verbose=verbose)
+
+        vamp_gauss_test(nz=100,ny=200,ns=10,map_est=True,est_meth='cg',verbose=verbose,tol=1e-4,tol_var=2e-1)
+        vamp_gauss_test(nz=200,ny=100,ns=10,map_est=True,est_meth='cg',verbose=verbose,tol=1e-4,tol_var=2e-1)
+        vamp_gauss_test(nz=100,ny=200,ns=1,map_est=True,est_meth='cg',verbose=verbose,tol=1e-4,tol_var=2e-1)
+        vamp_gauss_test(nz=200,ny=100,ns=1,map_est=True,est_meth='cg',verbose=verbose,tol=1e-4,tol_var=3e-1)
                 
     def test_vamp_gmm(self):
         """
         Run the vamp_gmm_test
         """        
         vamp_gmm_test(nz=1000,ny=500,ns=1,verbose=False)
+        vamp_gmm_test(nz=1000,ny=500,ns=1,verbose=False,est_meth='cg')
         
     def test_vamp_bg(self):
         """
         Run VAMP with a BG prior
         """
         vamp_bg_test(nz=1000,ny=500,ns=10,verbose=False)
+        vamp_bg_test(nz=1000,ny=500,ns=10,verbose=False,est_meth='cg')
         
 if __name__ == '__main__':    
     #vamp_bg_test(nz=1000,ny=500,ns=10,verbose=verbose)

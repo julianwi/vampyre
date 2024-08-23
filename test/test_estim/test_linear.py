@@ -48,6 +48,8 @@ def lin_test(zshape=(500,10),Ashape=(1000,500),verbose=False,tol=0.1):
     
     # Construct the linear estimator
     est = vp.estim.LinEst(Aop,y,wvar,var_axes='all')
+    # Construct same linear estimator with conjugate gradient method
+    est_cg = vp.estim.LinEst(Aop,y,wvar,var_axes='all',est_meth='cg')
     
     # Perform the initial estimate.  This is just run to make sure it
     # doesn't crash
@@ -56,6 +58,11 @@ def lin_test(zshape=(500,10),Ashape=(1000,500),verbose=False,tol=0.1):
         raise vp.common.TestException(\
            "est_init does not produce the correct shape")            
     
+    # Initial estimate with conjugate gradient method should match SVD method
+    zhat_cg, zhatvar_cg = est_cg.est_init()
+    if not np.allclose(zhat_cg, zhat, atol=1e-3, rtol=1e-3) or not np.allclose(zhatvar_cg, zhatvar, atol=1e-1, rtol=2e-1):
+        raise vp.common.TestException("Conjugate gradient initial estimate estimate does not match SVD method")
+
     # Posterior estimate
     zhat, zhatvar, cost = est.est(r,rvar,return_cost=True)
     zerr = np.mean(np.abs(z-zhat)**2)
@@ -65,6 +72,11 @@ def lin_test(zshape=(500,10),Ashape=(1000,500),verbose=False,tol=0.1):
     if fail:
        raise vp.common.TestException("Posterior estimate Gaussian error "+ 
           " does not match predicted value")      
+
+    # Posterior estimate with conjugate gradient method should match SVD method
+    zhat_cg, zhatvar_cg = est_cg.est(r,rvar)
+    if not np.allclose(zhat_cg, zhat, atol=1e-3, rtol=1e-3) or not np.allclose(zhatvar_cg, zhatvar, atol=1e-1, rtol=2e-1):
+        raise vp.common.TestException("Conjugate gradient posterior estimate estimate does not match SVD method")
     
 
 class TestCases(unittest.TestCase):
